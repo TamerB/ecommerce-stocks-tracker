@@ -1,0 +1,281 @@
+swagger: "2.0"
+info:
+  description: A service for keeping an accurate list of products and their stocks up to date
+  version: 0.1.0
+  title: E-Commerce Stocks Tracker
+basePath: /
+schemes:
+  - http
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /readyz:
+    get:
+      tags:
+      - Health
+      operationId: getReadyz
+      produces:
+      - text/plain
+      schemes:
+      - http
+      security: []   # No security
+      responses:
+        200:
+          $ref: '#/responses/stringOkResponse'
+  /healthz:
+    get:
+      tags:
+      - Health
+      operationId: getHealthz
+      produces:
+      - text/plain
+      schemes:
+      - http
+      security: []   # No security
+      responses:
+        200:
+          $ref: '#/responses/stringOkResponse'
+  /products/{sku}:
+    get:
+      tags:
+      - Product
+      summary: "Get a product by SKU"
+      description: "Get product entry by SKU"
+      operationId: GetProductBySku
+      produces:
+      - application/json
+      parameters:
+        - $ref: '#/parameters/sku'
+      responses:
+        200:
+          $ref: '#/responses/successfulOperationResponse'
+        400:
+          $ref: "#/responses/invalidError"
+        404:
+          $ref: "#/responses/productNotFoundError"
+        default:
+          $ref: "#/responses/genericError"
+  /products/{sku}/stocks:
+    get:
+      tags:
+      - Product
+      summary: "Get a product's stocks by SKU"
+      description: "Get product's stocks entries by SKU"
+      operationId: GetProductStocksBySku
+      produces:
+      - application/json
+      parameters:
+        - $ref: '#/parameters/sku'
+      responses:
+        200:
+          $ref: '#/responses/successfulOperationResponse'
+        400:
+          $ref: "#/responses/invalidError"
+        404:
+          $ref: "#/responses/productNotFoundError"
+        default:
+          $ref: "#/responses/genericError"
+  /products/{sku}/stocks/{country}:
+    put:
+      tags:
+      - Stock
+      summary: "Consumes a product's stock"
+      description: "Consumes a product's stock by SKU and country"
+      operationId: ConsumeProductStock
+      produces:
+      - application/json
+      parameters:
+        - $ref: '#/parameters/sku'
+        - $ref: '#/parameters/country'
+        - name: ConsumeProductStockParams
+          in: body
+          description: "Consume Product's stock in given country"
+          schema:
+            $ref: '#/definitions/ConsumeProductStockRequestBody'
+      responses:
+        200:
+          $ref: '#/responses/successfulOperationResponse'
+        400:
+          $ref: "#/responses/invalidError"
+        404:
+          $ref: "#/responses/productNotFoundError"
+        default:
+          $ref: "#/responses/genericError"
+parameters:
+  sku:
+    name: sku
+    in: path
+    description: "Product SKU"
+    required: true
+    type: "string"
+    maxLength: 12
+    pattern: "^[a-z0-9]+$"
+  country:
+    name: country
+    in: path
+    description: "Country Code"
+    required: true
+    type: "string"
+    maxLength: 2
+    pattern: "^[a-z]+$"
+responses:  
+  stringOkResponse:
+    description: OK
+    schema:
+      type: "string"
+      enum: [OK]
+  invalidError:
+    description: "Invalid SKU"
+    schema:
+      $ref: '#/definitions/BaseResponse'
+  productNotFoundError:
+    description: "Product not found"
+    schema:
+      $ref: '#/definitions/BaseResponse'
+  genericError:
+    description: "Return response with error other than the defined ones"
+    schema:
+      $ref: '#/definitions/BaseResponse'
+  successfulOperationResponse:
+    description: "successful operation"
+    schema:
+      $ref: "#/definitions/BaseResponse"
+definitions:
+  Product:
+    type: "object"
+    required:
+    - id
+    - sku
+    - name
+    - created_at
+    - updated_at
+    properties:
+      id:
+        description: "Product ID"
+        type: "integer"
+        format: "int64"
+      sku:
+        description: "Product SKU"
+        type: "string"
+      name:
+        description: "Product Name"
+        type: "string"
+      created_at:
+        description: "Product Creation Timestamp"
+        type: "string"
+        format: "date-time"
+      updated_at:
+        description: "Product Update Timestamp"
+        type: "string"
+        format: "date-time"
+  ProductStocks:
+    type: "object"
+    required:
+    - id
+    - sku
+    - name
+    - created_at
+    - updated_at
+    - stocks
+    properties:
+      id:
+        description: "Product ID"
+        type: "integer"
+        format: "int64"
+      sku:
+        description: "Product SKU"
+        type: "string"
+      name:
+        description: "Product Name"
+        type: "string"
+      created_at:
+        description: "Product Creation Timestamp"
+        type: "string"
+        format: "date-time"
+      updated_at:
+        description: "Product Update Timestamp"
+        type: "string"
+        format: "date-time"
+      stocks:
+        description: "Stocks per countries"
+        type: "array"
+        items:
+          $ref: "#/definitions/CountryStock"
+  CountryStock:
+    type: "object"
+    required:
+      - country
+      - quantity
+    properties:
+      country:
+        description: "Country Code"
+        type: "string"
+      quantity:
+        description: "Quantity in stock"
+        type: "integer"
+        format: "int64"
+  ConsumeProductStockRequestBody:
+    type: "object"
+    required:
+      - quantity
+    properties:
+      quantity:
+        description: "Quantity consumed"
+        type: "integer"
+        format: "int64"
+  BaseResponse:
+    type: object
+    description: Base response type
+    properties:
+      Success:
+        # This must be present in the response of all microservice APIs
+        type: boolean
+        description: Overall Success of the operation
+        example: false
+      Messages:
+        type: array
+        description: Messages to notify caller while hitting various limits
+        items:
+          $ref: '#/definitions/Message'
+      Errors:
+        # This must be present in the response of all microservice APIs
+        type: array
+        description: Errors encountered. Present only when `Success` is false.
+        items:
+          $ref: '#/definitions/Error'
+      Data:
+        type: "object"
+        description: "Response Data"
+        enum:
+          - Product
+          - ProductStocks
+  Message:
+    type: object
+    description: Informational message
+    properties:
+      Number:
+        type: integer
+        description: 'The message code to use when communicating about this problem'
+        example: 8001
+      Type:
+        type: string
+        description: 'Type of message, e.g. warning/info'
+        example: Info
+      Text:
+        type: string
+        description: 'A description of this message, which may include formatting specific to this context'
+        example: Location closed
+  Error:
+    type: object
+    description: Error information
+    properties:
+      Number:
+        type: integer
+        description: 'The error code to use when communicating about this problem'
+        example: 8001
+      Text:
+        type: string
+        description: 'A description of this error, which may include formatting specific to this context'
+        example: Some Failure
