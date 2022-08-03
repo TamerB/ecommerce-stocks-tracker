@@ -68,6 +68,8 @@ Ports which the service will be listening on to `http` requests.
 Database driver.
 #### `DB_SOURCE`
 Database source.
+### `DB_CONTAINER_NAME`
+DB Container name. This is used by Makefile to Run DB Docker container, create DB, and drop DB.
 
 
 ## Curl

@@ -1,11 +1,11 @@
 postgres:
-	docker run --name jumiap14 -p 5432:5432 -e POSTGRES_USER=$(DB_USER) -e POSTGRES_PASSWORD=$(DB_OWNER) -d postgres:14-alpine
+	docker run --name ${DB_CONTAINER_NAME} -p 5432:5432 -e POSTGRES_USER=$(DB_USER) -e POSTGRES_PASSWORD=$(DB_OWNER) -d postgres:14-alpine
 
 create_db:
-	docker exec -it jumiap14 createdb --username=$(DB_USER) --owner=$(DB_OWNER) $(DB_NAME)
+	docker exec -it ${DB_CONTAINER_NAME} createdb --username=$(DB_USER) --owner=$(DB_OWNER) $(DB_NAME)
 
 drop_db:
-	docker exec -it jumiap14 dropdb $(DB_NAME)
+	docker exec -it ${DB_CONTAINER_NAME} dropdb $(DB_NAME)
 
 migrate_up:
 	migrate -path db/migration/ -database $(DB_SOURCE) -verbose up
