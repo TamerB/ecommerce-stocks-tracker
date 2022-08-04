@@ -32,6 +32,6 @@ build:
 	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix nocgo -o "bin/ecommerce-stocks-tracker-service" "github.com/TamerB/ecommerce-stocks-tracker/api/cmd/stocks-tracker-server"
 
 run:
-	./bin/ecommerce-stocks-tracker
+	./bin/ecommerce-stocks-tracker-service
 
 .PHONY: postgres createdb dropdb migrateup migratedown sqlc check_install generate_server test mockgen build run

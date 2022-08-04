@@ -1,5 +1,5 @@
 # ecommerce-stocks-tracker
-This solution keeps an accurate list of products and their stocks up to date
+A service to keep an accurate list of products and their stocks up to date
 
 
 # E-commerce Stocks Tracker service
@@ -52,8 +52,6 @@ export DB_SOURCE=postgresql://<username>:<password>@localhost:5432/<db-name>?ssl
 
 make run
 ```
-To run the build with `http` connection only, please run `.bin/config-service --scheme http`.
-
 
 ### Arguments
 #### `-v`
@@ -63,7 +61,6 @@ Verbose mode, configures the service to output debug level log entries.
 
 #### `PORT`
 Ports which the service will be listening on to `http` requests.
-
 #### `DB_DRIVER`
 Database driver.
 #### `DB_SOURCE`
@@ -74,20 +71,19 @@ DB Container name. This is used by Makefile to Run DB Docker container, create D
 
 ## Curl
 
-After running the application, please go to `<http-or-https>://<host>:<port>/docs` for example CURL requests.
+After running the application, please go to `http://<host>:<port>/docs` for example CURL requests.
 
 Example: `http://localhost:9090/docs`
 
 ### GET Curl requests on terminal:
 
 ```
-curl -i http://<host>:<port-or-tls-port>/readyz
-curl -i http://<host>:<port-or-tls-port>/healthz
+curl -i http://<host>:<port>/readyz
+curl -i http://<host>:<port>/healthz
 
 curl -i http://<host>:<port>/products/<product-sku>
 curl -i http://<host>:<port>/products/<product-sku>/stocks
 ```
-If you are using self signed TLS certificate, you should add `-H` argument for the request to pass.
 
 #### Examples:
 ```

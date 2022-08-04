@@ -5,12 +5,12 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"strings"
 )
 
 // Store provides all functions to execute db queries and transactions
 type Store interface {
 	Querier
-	//execTx(context.Context, func(*Queries) error) error
 	ConsumeStockTx(context.Context, UpdateStockTxParams) error
 }
 
@@ -65,6 +65,9 @@ func (store *SQLStore) ConsumeStockTx(ctx context.Context, arg UpdateStockTxPara
 			Country: arg.CountryCode,
 		})
 		if err != nil {
+			if strings.Contains(err.Error(), "no rows in result set") {
+				return errors.New("stock not found")
+			}
 			return err
 		}
 
