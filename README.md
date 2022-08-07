@@ -66,7 +66,9 @@ Database driver.
 #### `DB_SOURCE`
 Database source.
 ### `DB_CONTAINER_NAME`
-DB Container name. This is used by Makefile to Run DB Docker container, create DB, and drop DB.
+Database Container name. This is used by Makefile to Run DB Docker container, create DB, and drop DB.
+### `DB_NAME`
+Database name
 
 
 ## Curl
